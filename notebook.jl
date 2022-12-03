@@ -28,6 +28,19 @@ let
 	p1,p2
 end
 
+# ╔═╡ ce372dac-c58b-444b-b0b6-a88665a58771
+let
+	# input and helper functions
+	input = readlines("./inputs/day3.txt")
+	priority(c) = c in 'a':'z' ? c - '`' : c - 'A' + 27
+	
+	p1 = sum(priority∘only, [intersect(l[1:end÷2], l[end÷2+1:end]) for l in input])
+
+	using Base.Iterators
+	p2 = sum(priority∘only, [intersect(l...) for l in partition(input, 3)])
+	p1, p2
+end
+
 # ╔═╡ 3156ab8c-71cb-11ed-204a-09b40247effd
 md"## Day 1"
 
@@ -45,6 +58,9 @@ end
 
 # ╔═╡ 6574e63c-d54c-4c53-8e28-0cd0e131ee41
 md"## Day 2"
+
+# ╔═╡ 995e1fb8-875f-48f0-8bc2-b81aa3bec651
+md"## Day 3"
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -69,9 +85,11 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 """
 
 # ╔═╡ Cell order:
-# ╠═3156ab8c-71cb-11ed-204a-09b40247effd
+# ╟─3156ab8c-71cb-11ed-204a-09b40247effd
 # ╠═25a6d924-5973-4868-91e2-3a4845a5a2a3
 # ╟─6574e63c-d54c-4c53-8e28-0cd0e131ee41
 # ╠═286e3758-9787-44dc-841f-85348b2748cd
+# ╟─995e1fb8-875f-48f0-8bc2-b81aa3bec651
+# ╠═ce372dac-c58b-444b-b0b6-a88665a58771
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
