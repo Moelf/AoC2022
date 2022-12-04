@@ -62,6 +62,25 @@ md"## Day 2"
 # ╔═╡ 995e1fb8-875f-48f0-8bc2-b81aa3bec651
 md"## Day 3"
 
+# ╔═╡ f9e5cdab-02a8-4314-a509-9f0b472dcaba
+md"## Day 4"
+
+# ╔═╡ 1e39b66d-fc6a-4dc1-b204-50d35dac18b2
+let
+	# input and helper functions
+	input = readlines("./inputs/day4.txt")
+	function ranges(line)
+		l1, h1, l2, h2 = parse.(Int, split(line, r"-|,"))
+		l1:h1, l2:h2
+	end
+	_in(a, b; by) = by(in(b), a) || by(in(a), b)
+	_in(by) = x -> _in(x...; by) # curring
+
+	p1 = count(_in(all)∘ranges, input)
+	p2 = count(_in(any)∘ranges, input)
+	p1, p2
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -91,5 +110,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 # ╠═286e3758-9787-44dc-841f-85348b2748cd
 # ╟─995e1fb8-875f-48f0-8bc2-b81aa3bec651
 # ╠═ce372dac-c58b-444b-b0b6-a88665a58771
+# ╟─f9e5cdab-02a8-4314-a509-9f0b472dcaba
+# ╠═1e39b66d-fc6a-4dc1-b204-50d35dac18b2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
