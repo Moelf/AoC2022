@@ -113,6 +113,19 @@ let
 	p1,p2
 end
 
+# ╔═╡ 08cb5e65-0a20-48ad-b14e-5296bff09023
+md"## Day 6"
+
+# ╔═╡ c610a703-eec7-4bad-ab2a-168091cc8207
+let
+	input = readchomp("./inputs/day6.txt")
+	decode(txt, N) = findfirst(i -> allunique(txt[i-N+1:i]), N:lastindex(txt))+N-1
+	
+	p1 = decode(input, 4)
+	p2 = decode(input, 14)
+	p1,p2
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -146,5 +159,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 # ╠═1e39b66d-fc6a-4dc1-b204-50d35dac18b2
 # ╟─060155c9-ff07-48bc-a8f7-44007e7d14bb
 # ╠═1138d342-50d7-4663-81a8-9ce1ca050b25
+# ╟─08cb5e65-0a20-48ad-b14e-5296bff09023
+# ╠═c610a703-eec7-4bad-ab2a-168091cc8207
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
