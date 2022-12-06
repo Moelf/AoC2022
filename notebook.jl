@@ -74,11 +74,43 @@ let
 		l1:h1, l2:h2
 	end
 	_in(a, b; by) = by(in(b), a) || by(in(a), b)
-	_in(by) = x -> _in(x...; by) # curring
+	_in(by) = x -> _in(x...; by) # currying
 
 	p1 = count(_in(all)∘ranges, input)
 	p2 = count(_in(any)∘ranges, input)
 	p1, p2
+end
+
+# ╔═╡ 060155c9-ff07-48bc-a8f7-44007e7d14bb
+md"## Day 5"
+
+# ╔═╡ 1138d342-50d7-4663-81a8-9ce1ca050b25
+let
+	input = readchomp("./inputs/day5.txt")
+	config_txt, inst_txt = split(input, "\n\n")
+	config_M = replace(
+			mapreduce(collect, hcat, 
+				eachline(IOBuffer(config_txt))
+			)[[2:4:34;], 1:end-1], 
+		' '=>missing)
+	inst = only.(eachmatch.(r"(\d+).*(\d+).*(\d+)", split(inst_txt, "\n")))
+	
+	function main(modifier)
+		config = reverse.(collect.(skipmissing.(eachrow(config_M))))
+		for i in inst
+			n, from, to = parse.(Int64, i)
+			E = lastindex(config[from])
+			ran = E-n+1:E
+			grab = config[from][ran]
+			deleteat!(config[from], ran)
+			append!(config[to], modifier(grab))	
+		end
+		join(last.(config))
+	end
+	
+	p1 = main(reverse)
+	p2 = main(identity)
+	p1,p2
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -112,5 +144,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 # ╠═ce372dac-c58b-444b-b0b6-a88665a58771
 # ╟─f9e5cdab-02a8-4314-a509-9f0b472dcaba
 # ╠═1e39b66d-fc6a-4dc1-b204-50d35dac18b2
+# ╟─060155c9-ff07-48bc-a8f7-44007e7d14bb
+# ╠═1138d342-50d7-4663-81a8-9ce1ca050b25
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
