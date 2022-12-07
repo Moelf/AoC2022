@@ -126,6 +126,47 @@ let
 	p1,p2
 end
 
+# ╔═╡ 48398739-f46c-4ce2-807b-20c7a0da4502
+md"## Day 7"
+
+# ╔═╡ accf7d6e-e4ed-4abc-83aa-6289122d1dea
+let
+	input = readlines("./inputs/day7.txt")
+	root_dict = Dict()
+	current = ""
+	for l in input
+		target = last(split(l))
+		if startswith(l, "\$ cd")
+			current = normpath(joinpath(current, target))
+		elseif startswith(l, "dir")
+		elseif startswith(l, "\$ ls")
+			root_dict[current] = Dict{String, Int}()
+		else
+			num, fname = split(l)
+			fsize = parse(Int64, num)
+			root_dict[current][fname] = fsize
+		end
+	end
+	Ks = keys(root_dict)
+	function dir_tot(path)
+		all_subs = filter(startswith(path), Ks)
+		return sum(sum(values(root_dict[sub])) for sub in all_subs)
+	end
+	
+	p1 = 0; p2 = typemax(Int64)
+	del_target = dir_tot("/") - 40000000
+	for k in Ks
+		dsum = dir_tot(k)
+		if dsum < 100000
+			p1 += dsum
+		end
+		if del_target < dsum < p2
+			p2 = dsum
+		end
+	end
+	p1, p2
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -161,5 +202,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 # ╠═1138d342-50d7-4663-81a8-9ce1ca050b25
 # ╟─08cb5e65-0a20-48ad-b14e-5296bff09023
 # ╠═c610a703-eec7-4bad-ab2a-168091cc8207
+# ╟─48398739-f46c-4ce2-807b-20c7a0da4502
+# ╠═accf7d6e-e4ed-4abc-83aa-6289122d1dea
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
