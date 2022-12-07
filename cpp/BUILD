@@ -58,3 +58,14 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "day7",
+    srcs = ["day7.cc"],
+    deps = ["@cxxopts//:cxxopts",
+            "//inputs:data"
+            ],
+    copts = [
+        "-std=c++2a", "-O3"
+    ],
+)
+
