@@ -167,6 +167,40 @@ let
 	p1, p2
 end
 
+# ╔═╡ d410eee3-d5a1-4aca-a77e-57421084d4bd
+md"## Day 8"
+
+# ╔═╡ 479775b7-5ba6-4f43-884a-79e28b108e0c
+let
+	input = mapreduce(collect, hcat, readlines("./inputs/day8.txt"))
+	forest = parse.(Int, input)
+	CI = CartesianIndex
+	CIs = CartesianIndices(input)
+	
+	function treelines(c)
+		c+CI(1, 0) : CI(99, c[2]),  #down
+		c+CI(0, 1) : CI(c[1], 99),  #right
+		reverse(CI(1, c[2]) : c-CI(1, 0)),    #up
+		reverse(CI(c[1], 1) : c-CI(0, 1))     #left
+	end
+	visible(c) = any(all(<(forest[c]), forest[tl]) for tl in treelines(c))
+	p1 = count(visible, CIs)
+
+	function scenic(c, tl)
+		score = 0
+		h0 = forest[c]
+		for h in forest[tl]
+			score += 1
+			h >= h0 && break
+		end
+		score
+	end
+	scenic(c) = prod(scenic.(Ref(c), treelines(c)))
+	p2=maximum(scenic, CIs)
+	
+	p1,p2
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -204,5 +238,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 # ╠═c610a703-eec7-4bad-ab2a-168091cc8207
 # ╟─48398739-f46c-4ce2-807b-20c7a0da4502
 # ╠═accf7d6e-e4ed-4abc-83aa-6289122d1dea
+# ╟─d410eee3-d5a1-4aca-a77e-57421084d4bd
+# ╠═479775b7-5ba6-4f43-884a-79e28b108e0c
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
