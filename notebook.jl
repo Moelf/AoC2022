@@ -178,10 +178,10 @@ let
 	CIs = CartesianIndices(input)
 	
 	function treelines(c)
-		c+CI(1, 0) : CI(99, c[2]),  #down
-		c+CI(0, 1) : CI(c[1], 99),  #right
-		reverse(CI(1, c[2]) : c-CI(1, 0)),    #up
-		reverse(CI(c[1], 1) : c-CI(0, 1))     #left
+		c+CI(1, 0) : CI(99, c[2]),         #down
+		c+CI(0, 1) : CI(c[1], 99),         #right
+		reverse(CI(1, c[2]) : c-CI(1, 0)), #up
+		reverse(CI(c[1], 1) : c-CI(0, 1))  #left
 	end
 	visible(c) = any(all(<(forest[c]), forest[tl]) for tl in treelines(c))
 	p1 = count(visible, CIs)
@@ -199,6 +199,45 @@ let
 	p2=maximum(scenic, CIs)
 	
 	p1,p2
+end
+
+# ╔═╡ 77b46bc4-0b63-4a8a-8e06-92b3f0a3f12e
+md"## Day 9"
+
+# ╔═╡ 0c005615-a806-4501-90ed-88471522e5f0
+let
+	input = readlines("./inputs/day9.txt")
+	CI = CartesianIndex
+	function follow(H, T)
+		Δ = H - T
+		if abs(Δ[1]) <= 1 && abs(Δ[2]) <= 1
+			T
+		else
+			T + CI(sign(Δ[1]), sign(Δ[2]))
+		end
+	end
+	dir = Dict("R"=>CI(0,1), "L"=>CI(0, -1), "U"=>CI(1, 0), "D"=>CI(-1, 0))
+	function snake(N)
+		visited = Set([CI(1,1)])
+		knots = fill(CI(1,1), N)
+		for line in input
+			d_txt, n_txt = split(line)
+			d = dir[d_txt]
+			n = parse(Int, n_txt)
+			for _ = 1:n
+				knots[1] += d
+				for i = 2:N
+					knots[i] = follow(knots[i-1], knots[i])
+				end
+				push!(visited, last(knots))
+			end
+		end
+		return length(visited)
+	end
+	
+	p1 = snake(2)
+	p2 = snake(10)
+	p1, p2
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -240,5 +279,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 # ╠═accf7d6e-e4ed-4abc-83aa-6289122d1dea
 # ╟─d410eee3-d5a1-4aca-a77e-57421084d4bd
 # ╠═479775b7-5ba6-4f43-884a-79e28b108e0c
+# ╟─77b46bc4-0b63-4a8a-8e06-92b3f0a3f12e
+# ╠═0c005615-a806-4501-90ed-88471522e5f0
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
