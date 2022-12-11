@@ -42,7 +42,7 @@ let
 end
 
 # ╔═╡ 3156ab8c-71cb-11ed-204a-09b40247effd
-md"## Day 1"
+md"# Day 1"
 
 # ╔═╡ 25a6d924-5973-4868-91e2-3a4845a5a2a3
 let
@@ -57,13 +57,13 @@ let
 end
 
 # ╔═╡ 6574e63c-d54c-4c53-8e28-0cd0e131ee41
-md"## Day 2"
+md"# Day 2"
 
 # ╔═╡ 995e1fb8-875f-48f0-8bc2-b81aa3bec651
-md"## Day 3"
+md"# Day 3"
 
 # ╔═╡ f9e5cdab-02a8-4314-a509-9f0b472dcaba
-md"## Day 4"
+md"# Day 4"
 
 # ╔═╡ 1e39b66d-fc6a-4dc1-b204-50d35dac18b2
 let
@@ -82,7 +82,7 @@ let
 end
 
 # ╔═╡ 060155c9-ff07-48bc-a8f7-44007e7d14bb
-md"## Day 5"
+md"# Day 5"
 
 # ╔═╡ 1138d342-50d7-4663-81a8-9ce1ca050b25
 let
@@ -114,7 +114,7 @@ let
 end
 
 # ╔═╡ 08cb5e65-0a20-48ad-b14e-5296bff09023
-md"## Day 6"
+md"# Day 6"
 
 # ╔═╡ c610a703-eec7-4bad-ab2a-168091cc8207
 let
@@ -127,7 +127,7 @@ let
 end
 
 # ╔═╡ 48398739-f46c-4ce2-807b-20c7a0da4502
-md"## Day 7"
+md"# Day 7"
 
 # ╔═╡ accf7d6e-e4ed-4abc-83aa-6289122d1dea
 let
@@ -168,7 +168,7 @@ let
 end
 
 # ╔═╡ d410eee3-d5a1-4aca-a77e-57421084d4bd
-md"## Day 8"
+md"# Day 8"
 
 # ╔═╡ 479775b7-5ba6-4f43-884a-79e28b108e0c
 let
@@ -202,7 +202,7 @@ let
 end
 
 # ╔═╡ 77b46bc4-0b63-4a8a-8e06-92b3f0a3f12e
-md"## Day 9"
+md"# Day 9"
 
 # ╔═╡ 0c005615-a806-4501-90ed-88471522e5f0
 let
@@ -237,6 +237,99 @@ let
 	
 	p1 = snake(2)
 	p2 = snake(10)
+	p1, p2
+end
+
+# ╔═╡ d741b76c-ac2e-483c-9a0c-b4c4aebf5777
+md"# Day 10"
+
+# ╔═╡ 6dd4a4e4-c541-4554-9aa8-160a6982bc16
+let
+	input = split.(readlines("./inputs/day10.txt"))
+	cycle = X = idx = 1
+	WIDTH = 40
+	p1 = _add = 0
+	canvas = fill('.', WIDTH, 6)
+	
+	while idx < lastindex(input)
+		inst = input[idx]
+		cycle in 20:40:220 && (p1 += X*cycle)
+		X <= rem(cycle, WIDTH) <= X+2 && (canvas[cycle] = '#')
+		
+		if _add != 0 # buffered addv
+			X += _add
+			_add = 0
+		elseif inst[1] == "noop"
+			idx += 1
+		elseif _add == 0
+			_add = parse(Int, inst[2])
+			idx += 1
+		end
+		cycle += 1
+	end
+	
+	print(p1, '\n', join(join.(eachcol(canvas)), "\n"))
+end
+
+# ╔═╡ 63f8825c-5bfa-4b57-a0c0-76b35df34fc2
+md"# Day 11"
+
+# ╔═╡ 72894ac2-e464-47fb-8045-692a81e8ed73
+let
+	struct Monkey{F}
+		items::Vector{Int}
+		op::F
+		div::Int
+		targets::NTuple{2, Int}
+		seen::Ref{Int}
+	end
+	function Monkey(str)
+		l = split(str, '\n')
+		items = parse.(Int, only.(eachmatch(r"(\d+)", l[2])))
+		op_str, n = last(split(l[3]), 2)
+		op = getfield(Main, Symbol(op_str))
+		func = if n == "old"
+			x -> op(x, x)
+		else
+			let N = parse(Int, n) # don't close-over `n`
+				x -> op(x, N)
+			end
+		end
+		testdiv = parse(Int, last(split(l[4])))
+		targets = Tuple(parse(Int, last(split(x))) for x in l[5:6]) .+ 1
+		
+		Monkey(items, func, testdiv, targets, Ref(0))
+	end
+	function inspect!(M; denom, ring)
+		(; op, items) = M
+		M.seen[] += length(items)
+		@. items = fld(op(mod(items, denom*ring)), denom)
+	end
+	monkeytest(M, item) = rem(item, M.div) == 0
+	throwto(M, item, MS) = monkeytest(M, item) ? M.targets[1] : M.targets[2]
+	function turn!(Ms, M; kw...)
+		inspect!(M; kw...)
+		items = M.items
+		while !isempty(items)
+			item = popfirst!(items)
+			idx = throwto(M, item, M)
+			push!(Ms[idx].items, item)
+		end
+	end
+	function play!(N, Ms; kw...)
+		for _=1:N, m in Ms
+			turn!(Ms, m; kw...)
+		end
+		last(sort!([m.seen[] for m in Ms]), 2) |> prod
+	end
+	
+	input = split(readchomp("./inputs/day11.txt"), "\n\n")
+
+	monkeys = Monkey.(input)
+	ring = prod(m.div for m in monkeys)
+	p1 = play!(20, monkeys; denom=3, ring)
+	p2 = play!(10000, Monkey.(input); denom=1, ring)
+
 	p1, p2
 end
 
@@ -281,5 +374,9 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 # ╠═479775b7-5ba6-4f43-884a-79e28b108e0c
 # ╟─77b46bc4-0b63-4a8a-8e06-92b3f0a3f12e
 # ╠═0c005615-a806-4501-90ed-88471522e5f0
+# ╟─d741b76c-ac2e-483c-9a0c-b4c4aebf5777
+# ╠═6dd4a4e4-c541-4554-9aa8-160a6982bc16
+# ╟─63f8825c-5bfa-4b57-a0c0-76b35df34fc2
+# ╠═72894ac2-e464-47fb-8045-692a81e8ed73
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
