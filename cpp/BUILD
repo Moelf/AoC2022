@@ -83,6 +83,9 @@ cc_binary(
 cc_library(
     name = "utils",
     srcs = ["utils.cc", "utils.h"],
+    deps = [
+        "@boost//:functional"
+    ],
     copts = [
         "-std=c++2a", "-O3"
     ],
@@ -108,6 +111,31 @@ cc_binary(
     srcs = ["day10.cc"],
     deps = [
         ":utils",
+        "@cxxopts//:cxxopts",
+    ],
+    copts = [
+        "-std=c++2a", "-O3"
+    ],
+)
+
+cc_binary(
+    name = "day11",
+    srcs = ["day11.cc"],
+    deps = [
+        ":utils",
+        "//inputs:data"
+    ],
+    copts = [
+        "-std=c++2a", "-O3"
+    ],
+)
+
+cc_binary(
+    name = "day12",
+    srcs = ["day12.cc"],
+    deps = [
+        ":utils",
+        "//inputs:data",
         "@cxxopts//:cxxopts",
     ],
     copts = [
