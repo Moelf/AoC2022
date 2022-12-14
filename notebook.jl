@@ -403,6 +403,63 @@ let
 	p1, p2
 end
 
+# ╔═╡ 6d2a96d0-f182-4aac-a3fe-9d47f69fde57
+md"## Day 14"
+
+# ╔═╡ cd9553fa-754e-40a5-a0af-00dd4a1a34f9
+let
+	CI = CartesianIndex
+	input = split.(readlines("./inputs/day14.txt"), r" -> |,")
+	scans = map(input) do line
+		pairs = Iterators.partition(parse.(Int, line) .+ 1 , 2)
+		map(Base.splat(CI)∘reverse, pairs)
+	end
+	SIZE = Tuple(maximum(reduce(vcat, scans))) .+ (2,68)
+	rockline(c1, c2) = c1:CI(replace(sign.(Tuple(c2) .- Tuple(c1)), 0=>1)...):c2
+	function next_pos(M, pos)
+		down = pos + CI(1, 0)
+		ld = pos + CI(1, -1)
+		lr = pos + CI(1, 1)
+		for next in (down, ld, lr)
+			!M[next] && return next
+		end
+		return pos
+	end
+	function simulate(SIZE, scans; floor = false)
+		M = fill(false, SIZE)
+		for s in scans, i = 1:lastindex(s)-1
+			idxs = rockline(s[i], s[i+1])
+			@views M[idxs] .= true
+		end
+		
+		if floor
+			last(eachrow(M)) .= true
+		end
+	
+		sand = 0
+		START = CI(1,501)
+		
+		while true
+			pos = START
+			while true
+				pos[1]+1 > SIZE[1] && return sand # end simulation
+				new_pos = next_pos(M, pos)
+				new_pos == START && return sand + 1 # end simulation
+				if new_pos == pos # settled sand
+					M[new_pos] = true
+					break
+				end
+				pos = new_pos
+			end
+			sand += 1
+		end
+	end
+
+	p1 = simulate(SIZE, scans; floor=false)
+	p2 = simulate(SIZE, scans; floor=true)
+	p1, p2
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -452,5 +509,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 # ╠═230590e2-4404-4b02-9b27-73e2642f8584
 # ╟─293d9a47-ba00-44ef-8021-b893e0de5e26
 # ╠═a6bdacd1-70e1-4878-bef4-4342d5dcdb23
+# ╟─6d2a96d0-f182-4aac-a3fe-9d47f69fde57
+# ╠═cd9553fa-754e-40a5-a0af-00dd4a1a34f9
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
