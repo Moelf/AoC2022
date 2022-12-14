@@ -333,6 +333,76 @@ let
 	p1, p2
 end
 
+# ╔═╡ d02baf9c-5989-4156-b97c-cc478c89f09d
+md"## Day 12"
+
+# ╔═╡ 230590e2-4404-4b02-9b27-73e2642f8584
+let
+	# Matrix{Char}
+	input = mapreduce(permutedims∘collect, vcat, readlines("./inputs/day12.txt"))
+	start = findfirst(==('S'), input)
+	dest = findfirst(==('E'), input)
+	CI = CartesianIndex
+	adjs = Tuple(CI(x) for x in ((0,1), (0,-1), (1,0), (-1,0)))
+	# Matrix{Int}
+	terr = replace(input, 'S'=>'a', 'E'=>'z')
+
+	function main(M, start, dest)
+	    CM = CartesianIndices(M)
+	    Q = [0=>start]
+	    tot_risks = fill(typemax(Int), size(M))
+	    while true
+			isempty(Q) && return typemax(Int) # dead end
+	        risk, here = pop!(Q)
+	        tot_risks[here] <= risk && continue # not a better route
+	        tot_risks[here] = risk
+	        here == dest && return risk # reached goal
+	
+	        for a in adjs
+	            (ne = here+a) ∉ CM && continue # out of bound
+				M[ne] - M[here] >1 && continue # can't climb
+	            s = risk + 1 => ne
+	            i = searchsortedfirst(Q, s; rev=true)
+	            insert!(Q, i, s)
+	        end
+	    end
+	end
+
+	p1 = main(terr, start, dest)
+	As = findall(==('a'), terr)
+	p2 = minimum(s->main(terr, s, dest), As)
+	p1, p2
+end
+
+# ╔═╡ 293d9a47-ba00-44ef-8021-b893e0de5e26
+md"## Day 13"
+
+# ╔═╡ a6bdacd1-70e1-4878-bef4-4342d5dcdb23
+let
+	input = eval.(Meta.parse.(filter(!isempty, readlines("./inputs/day13.txt"))))
+	comp(a::Number, b::Number) = a < b ? true : a > b ? false : nothing
+	comp(a::Number, b::Vector) = comp([a], b)
+	comp(a::Vector, b::Number) = comp(a, [b])
+	function comp(a::Vector, b::Vector)
+		for i in eachindex(b)
+			!isassigned(a, i) && return true
+			c = comp(a[i], b[i])
+			isnothing(c) && continue # inconclusive
+			return c
+		end
+		length(b) < length(a) && return false
+		return nothing
+	end
+
+	p1 = findall(i->comp(input[i], input[i+1]), 1:2:300) |> sum
+	
+	push!(input, [[2]]); push!(input, [[6]])
+	sort!(input; lt=comp)
+	p2 = findfirst(==([[2]]), input) * findfirst(==([[6]]), input)
+
+	p1, p2
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -378,5 +448,9 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 # ╠═6dd4a4e4-c541-4554-9aa8-160a6982bc16
 # ╟─63f8825c-5bfa-4b57-a0c0-76b35df34fc2
 # ╠═72894ac2-e464-47fb-8045-692a81e8ed73
+# ╟─d02baf9c-5989-4156-b97c-cc478c89f09d
+# ╠═230590e2-4404-4b02-9b27-73e2642f8584
+# ╟─293d9a47-ba00-44ef-8021-b893e0de5e26
+# ╠═a6bdacd1-70e1-4878-bef4-4342d5dcdb23
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
